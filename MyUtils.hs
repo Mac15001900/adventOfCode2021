@@ -10,17 +10,6 @@ import System.IO
 a |> f = f a
 
 --Takes a file path and a function, runs that function on the file's contents, and prints the function's output. Trims the last line of the file if it's an empty line
-runOnFile :: Show a => Read b  => String -> ([b]->a) -> IO ()
-runOnFile input start = do
-   handle <- openFile input ReadMode
-   contents <- hGetContents handle
-   let lines = splitOn '\n' contents
-   let linesTrimmed = if last lines == "" then init lines else lines
-   let linesRead = map read linesTrimmed
-   print $ start linesRead
-   hClose handle
-
-{-
 runOnFile :: Show a => String -> ([String]->a) -> IO ()
 runOnFile input start = do
    handle <- openFile input ReadMode
@@ -29,9 +18,20 @@ runOnFile input start = do
    let linesTrimmed = if last lines == "" then init lines else lines
    print $ start linesTrimmed
    hClose handle      
--}   
-runOnFile2 :: ([String]->String) -> String -> IO ()
-runOnFile2 start input = do
+
+--Takes a file path and a function, runs that function on the file's contents, and prints the function's output. Maps 'read' over the file contents. Trims the last line of the file if it's an empty line
+runOnFile2 :: Show a => Read b  => String -> ([b]->a) -> IO ()
+runOnFile2 input start = do
+   handle <- openFile input ReadMode
+   contents <- hGetContents handle
+   let lines = splitOn '\n' contents
+   let linesTrimmed = if last lines == "" then init lines else lines
+   let linesRead = map read linesTrimmed
+   print $ start linesRead
+   hClose handle
+   
+runOnFile3 :: ([String]->String) -> String -> IO ()
+runOnFile3 start input = do
    handle <- openFile input ReadMode
    contents <- hGetContents handle
    let lines = split (=='\n') contents
