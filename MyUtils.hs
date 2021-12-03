@@ -1,6 +1,6 @@
 
 
-module MyUtils (runOnFile,runOnFile2,(|>),split,count,freq,exists,(!!?),unique,unique',rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, removeNothing, indexes, zipWithIndexes, map2, map3, setElement, setElement2, setElement3, empty2, empty3, directions2D, directions3D, flattenMaybe) where
+module MyUtils (runOnFile,runOnFile2,(|>),split,count,freq,exists,(!!?),unique,unique',rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, removeNothing, indexes, zipWithIndexes, map2, map3, setElement, setElement2, setElement3, empty2, empty3, directions2D, directions3D, flattenMaybe, divF) where
 import Control.Monad
 import Data.List
 import Data.Maybe
@@ -140,6 +140,9 @@ flattenMaybe :: Maybe (Maybe a) -> Maybe a
 flattenMaybe Nothing = Nothing
 flattenMaybe (Just Nothing) = Nothing
 flattenMaybe (Just (Just a)) = Just a
+
+divF :: Int -> Int -> Float
+divF x y = (fromIntegral x) / (fromIntegral y)
 
 tempDist :: [Float] -> Float
 tempDist [x,y] = ((394-x)**2+(411-y)**2) |> sqrt
