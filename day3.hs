@@ -1,10 +1,9 @@
 import MyUtils 
-import Debug.Trace
 
 data Bit = Zero | One deriving (Show, Read, Eq)
 
 part1 :: [String] -> Int
-part1 input = [0..(length (input!!0)-1)] |> map (\i->map (!!i) bits) |> map (count (==One)) |> map (\a-> if a>(length input) `div` 2 then One else Zero) |> \res-> (binaryToInt res) * (binaryToInt (flipBinary res))  where
+part1 input = [0..(length (input!!0)-1)] |> map (\i->map (!!i) bits) |> map mostCommon |> \res-> (binaryToInt res) * (binaryToInt (flipBinary res))  where
     bits = map parse input
 
 parse :: String -> [Bit]
