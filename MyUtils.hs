@@ -1,6 +1,6 @@
 
 
-module MyUtils (runOnFile,runOnFile2,(|>),split,count,freq,exists,(!!?),unique,unique',rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, removeNothing, indexes, zipWithIndexes, map2, map3, setElement, setElement2, setElement3, empty2, empty3, directions2D, directions3D, flattenMaybe, divF) where
+module MyUtils (runOnFile,runOnFile2,(|>),split,count,freq,exists,separate,(!!?),unique,unique',rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, removeNothing, indexes, zipWithIndexes, map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, directions2D, directions3D, flattenMaybe, divF, sign) where
 import Control.Monad
 import Data.List
 import Data.Maybe
@@ -53,6 +53,14 @@ freq (x:xs) a = (if x==a then 1 else 0) + (freq xs a)
 
 exists :: (a->Bool) -> [a] -> Bool
 exists p xs = isJust (find p xs) 
+
+--Separates a list into elements that do and don'this fit a predicate
+separate :: (a->Bool) -> [a] -> ([a],[a])
+separate p as = separate' p as ([],[])
+
+separate' :: (a->Bool) -> [a] -> ([a],[a]) -> ([a],[a])
+separate' p [] acc = acc
+separate' p (a:as) (ts,fs) = separate' p as (if p a then (a:ts,fs) else (ts,a:fs))
 
 (!!?) :: [a] -> Int -> Maybe a
 list !!? index = if index<0 || index>=length list then Nothing else Just (list!!index)
@@ -130,6 +138,15 @@ setElement2 i j x xs = (take j xs)++[setElement i x (xs!!j)]++(drop (j+1) xs)
 setElement3 :: Int -> Int -> Int -> a -> [[[a]]] -> [[[a]]]
 setElement3 i j k x xs = (take k xs)++[setElement2 i j x (xs!!k)]++(drop (k+1) xs)
 
+changeElement :: Int -> (a->a) -> [a] -> [a]
+changeElement i f xs = (take i xs)++[f (xs!!i)]++(drop (i+1) xs)
+
+changeElement2 :: Int -> Int -> (a->a) -> [[a]] -> [[a]]
+changeElement2 i j f xs = (take j xs)++[changeElement i f (xs!!j)]++(drop (j+1) xs)
+
+changeElement3 :: Int -> Int -> Int -> (a->a) -> [[[a]]] -> [[[a]]]
+changeElement3 i j k f xs = (take k xs)++[changeElement2 i j f (xs!!k)]++(drop (k+1) xs)
+
 directions2D :: [(Int,Int)]
 directions2D = [(-1,-1), (0,-1), (1,-1), (-1,0), (1,0), (-1,1), (0,1), (1,1)]
 
@@ -143,6 +160,12 @@ flattenMaybe (Just (Just a)) = Just a
 
 divF :: Int -> Int -> Float
 divF x y = (fromIntegral x) / (fromIntegral y)
+
+sign :: Int -> Int
+sign x
+      | x > 0  = 1
+      | x == 0 = 0
+      | x < 0  = -1 
 
 tempDist :: [Float] -> Float
 tempDist [x,y] = ((394-x)**2+(411-y)**2) |> sqrt
