@@ -1,6 +1,6 @@
 
 
-module MyUtils (runOnFile,runOnFile2,(|>),split,count,freq,exists,separate,(!!?),unique,unique',rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, removeNothing, indexes, zipWithIndexes, map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, directions2D, directions3D, flattenMaybe, divF, sign) where
+module MyUtils (runOnFile,runOnFile2,(|>),split,count,freq,exists,separate,(!!?),unique,unique',rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, removeNothing, indexes, zipWithIndexes, map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, directions2D, directions3D, flattenMaybe, divF, mean, meanI, sign) where
 import Control.Monad
 import Data.List
 import Data.Maybe
@@ -160,6 +160,12 @@ flattenMaybe (Just (Just a)) = Just a
 
 divF :: Int -> Int -> Float
 divF x y = (fromIntegral x) / (fromIntegral y)
+
+mean :: Fractional a => [a] -> a
+mean as = (sum as) / (length as |> fromIntegral)
+
+meanI ::  Integral a => [a] -> Float
+meanI as = (sum as |> fromIntegral) / (length as |> fromIntegral)
 
 sign :: Int -> Int
 sign x
