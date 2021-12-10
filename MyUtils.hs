@@ -1,6 +1,6 @@
 
 
-module MyUtils (runOnFile,runOnFile2,(|>),split,count,freq,exists,separate,(!!?),unique,unique',rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, removeNothing, indexes, zipWithIndexes, map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, directions2D, directions3D, flattenMaybe, divF, mean, meanI, sign) where
+module MyUtils (runOnFile,runOnFile2,(|>),split,count,freq,exists,separate,(!!?),unique,unique',combinations,rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, removeNothing, indexes, zipWithIndexes, map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, directions2D, directions3D, flattenMaybe, divF, mean, meanI, sign) where
 import Control.Monad
 import Data.List
 import Data.Maybe
@@ -78,6 +78,9 @@ rotateMatrix (x:xs) = foldr largerZip (map (\a->[a]) x) (reverse xs) |> map reve
 largerZip :: [a] -> [[a]] -> [[a]]
 largerZip []     []       = []
 largerZip (x:xs) (ys:yss) = (x:ys):(largerZip xs yss)
+
+combinations :: [a] -> [b] -> [(a,b)]
+combinations as bs = map (\a-> map (\b-> (a,b)) bs) as |> concat
 
 splitOn :: Eq a => a -> [a] -> [[a]]
 splitOn a xs = splitOn' a xs []
