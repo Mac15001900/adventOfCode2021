@@ -1,6 +1,7 @@
-
-
-module MyUtils (runOnFile,runOnFile2,(|>),split,count,freq,exists,separate,(!!?),unique,unique',combinations,rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, removeNothing, indexes, zipWithIndexes, map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, directions2D, directions3D, flattenMaybe, divF, mean, meanI, sign) where
+module MyUtils (runOnFile,runOnFile2,(|>),split,count,count2,freq,exists,separate,(!!?),unique,unique',combinations,
+      rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, repeatUntil, removeNothing, indexes, zipWithIndexes, 
+      map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, directions2D, directions3D, flattenMaybe,
+      divF, mean, meanI, sign, pair, pairS, mapFst, mapSnd, mapBoth, fst3, snd3, thr3) where
 import Control.Monad
 import Data.List
 import Data.Maybe
@@ -46,6 +47,9 @@ split p s =  case dropWhile p s of
 
 count :: (a->Bool) -> [a] -> Int
 count p = length . (filter p)
+
+count2 :: (a->Bool) -> [[a]] -> Int
+count2 p as = map (count p) as |> sum
 
 freq :: Eq a => [a] -> a -> Int
 freq [] _     = 0
@@ -107,6 +111,9 @@ tupleMap f = map (\(a,b) -> f a b)
 repeatF :: Int -> (a->a) -> a -> a
 repeatF 0 _ x = x
 repeatF n f x = repeatF (n-1) f (f x)
+
+repeatUntil :: (a->Bool) -> (a->a) -> a -> a
+repeatUntil p f a = if p a then a else repeatUntil p f (f a)
 
 removeNothing :: [Maybe a] -> [a]
 removeNothing [] = []
@@ -175,6 +182,31 @@ sign x
       | x > 0  = 1
       | x == 0 = 0
       | x < 0  = -1 
+
+pair :: a -> b -> (a, b)
+pair a b = (a,b)
+
+pairS :: a -> b -> (b, a)
+pairS a b = (b, a)
+
+mapFst :: (a -> c) -> (a, b) -> (c, b)
+mapFst f (a,b) = (f a, b)
+
+mapSnd :: (b -> c) -> (a, b) -> (a, c)
+mapSnd f (a,b) = (a, f b)
+
+mapBoth :: (a -> b) -> (a, a) -> (b, b)
+mapBoth f (x,y) = (f x, f y)
+
+fst3 :: (a,b,c) -> a
+fst3 (a,b,c) = a
+snd3 :: (a,b,c) -> b
+snd3 (a,b,c) = b
+thr3 :: (a,b,c) -> c
+thr3 (a,b,c) = c
+
+
+
 
 tempDist :: [Float] -> Float
 tempDist [x,y] = ((394-x)**2+(411-y)**2) |> sqrt
