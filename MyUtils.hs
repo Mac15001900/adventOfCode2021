@@ -1,7 +1,7 @@
-module MyUtils (runOnFile,runOnFile2,(|>),split,count,count2,freq,exists,separate,(!!?),unique,unique',combinations,
-      rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, repeatUntil, removeNothing, indexes, zipWithIndexes, 
+module MyUtils (runOnFile,runOnFile2,runOnFile4,(|>),split,count,count2,freq,exists,separate,(!!?),unique,unique',combinations,
+      rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, repeatUntil, removeNothing, indexes, zipWithIndexes, zip2, zipF,
       map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, directions2D, directions3D, flattenMaybe,
-      divF, mean, meanI, sign, pair, pairS, mapFst, mapSnd, mapBoth, fst3, snd3, thr3) where
+      divF, mean, meanI, sign, pair, pairS, mapFst, mapSnd, mapBoth, fst3, snd3, thd3) where
 import Control.Monad
 import Data.List
 import Data.Maybe
@@ -20,9 +20,18 @@ runOnFile input start = do
    print $ start linesTrimmed
    hClose handle      
 
---Takes a file path and a function, runs that function on the file's contents, and prints the function's output. Maps 'read' over the file contents. Trims the last line of the file if it's an empty line
-runOnFile2 :: Show a => Read b  => String -> ([b]->a) -> IO ()
+runOnFile2 :: String -> ([String]->IO()) -> IO ()
 runOnFile2 input start = do
+   handle <- openFile input ReadMode
+   contents <- hGetContents handle
+   let lines = splitOn '\n' contents
+   let linesTrimmed = if last lines == "" then init lines else lines
+   start linesTrimmed
+   hClose handle    
+
+--Takes a file path and a function, runs that function on the file's contents, and prints the function's output. Maps 'read' over the file contents. Trims the last line of the file if it's an empty line
+runOnFile3 :: Show a => Read b  => String -> ([b]->a) -> IO ()
+runOnFile3 input start = do
    handle <- openFile input ReadMode
    contents <- hGetContents handle
    let lines = splitOn '\n' contents
@@ -31,8 +40,8 @@ runOnFile2 input start = do
    print $ start linesRead
    hClose handle
    
-runOnFile3 :: ([String]->String) -> String -> IO ()
-runOnFile3 start input = do
+runOnFile4 :: ([String]->String) -> String -> IO ()
+runOnFile4 start input = do
    handle <- openFile input ReadMode
    contents <- hGetContents handle
    let lines = split (=='\n') contents
@@ -60,7 +69,7 @@ exists p xs = isJust (find p xs)
 
 --Separates a list into elements that do and don'this fit a predicate
 separate :: (a->Bool) -> [a] -> ([a],[a])
-separate p as = separate' p as ([],[])
+separate p as = separate' p (reverse as) ([],[])
 
 separate' :: (a->Bool) -> [a] -> ([a],[a]) -> ([a],[a])
 separate' p [] acc = acc
@@ -69,12 +78,13 @@ separate' p (a:as) (ts,fs) = separate' p as (if p a then (a:ts,fs) else (ts,a:fs
 (!!?) :: [a] -> Int -> Maybe a
 list !!? index = if index<0 || index>=length list then Nothing else Just (list!!index)
 
-unique :: Eq a  => [a] -> [a]
-unique xs = xs |> reverse |> unique' |> reverse
 
-unique' :: Eq a => [a] -> [a]
-unique' []     = []
-unique' (x:xs) = if freq xs x >0 then unique' xs else x:unique' xs
+unique :: Eq a  => [a] -> [a]
+unique xs = xs |> unique' [] |> reverse
+
+unique' :: Eq a => [a] -> [a] -> [a]
+unique' res []     = res
+unique' res (x:xs) = if elem x res then unique' res xs else unique' (x:res) xs
 
 rotateMatrix :: [[a]] -> [[a]]
 rotateMatrix (x:xs) = foldr largerZip (map (\a->[a]) x) (reverse xs) |> map reverse
@@ -127,6 +137,12 @@ indexes a = [0..(length a)-1]
 zipWithIndexes :: [a] -> [(a,Int)]
 zipWithIndexes a = zip a (indexes a)
 
+zip2 :: [[a]] -> [[b]] -> [[(a,b)]]
+zip2 ass bss = zip ass bss |> map (\(as,bs)-> zip as bs)
+
+zipF :: (a->b) -> [a] -> [(a,b)]
+zipF f as = zip as (map f as)
+
 map2 :: (a->b) -> [[a]] -> [[b]]
 map2 f = map (map f)
 
@@ -165,8 +181,7 @@ directions3D = [(-1,-1,-1),(-1,-1,0),(-1,-1,1),(-1,0,-1),(-1,0,0),(-1,0,1),(-1,1
 
 flattenMaybe :: Maybe (Maybe a) -> Maybe a
 flattenMaybe Nothing = Nothing
-flattenMaybe (Just Nothing) = Nothing
-flattenMaybe (Just (Just a)) = Just a
+flattenMaybe (Just a) = a
 
 divF :: Int -> Int -> Float
 divF x y = (fromIntegral x) / (fromIntegral y)
@@ -202,8 +217,8 @@ fst3 :: (a,b,c) -> a
 fst3 (a,b,c) = a
 snd3 :: (a,b,c) -> b
 snd3 (a,b,c) = b
-thr3 :: (a,b,c) -> c
-thr3 (a,b,c) = c
+thd3 :: (a,b,c) -> c
+thd3 (a,b,c) = c
 
 
 
