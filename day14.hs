@@ -1,16 +1,13 @@
 import MyUtils
 import Data.List
 import qualified Data.Map as Map
-import Control.DeepSeq
 
 type Rules = Map.Map (Char,Char) Char
-type Polymer = String
+type Count = Map.Map Char Int
+type Known = Map.Map ((Char,Char), Int) Count
 
 parseRules :: [String] -> Rules
 parseRules input = map (\line->splitOn ' ' line |> \splat-> ((head $ head splat,last $ head splat), head (last splat))) input |> Map.fromList
-
-type Count = Map.Map Char Int
-type Known = Map.Map ((Char,Char), Int) Count
 
 emptyCount :: String -> Count
 emptyCount input = input |> unique |> (flip zip) (repeat 0) |> Map.fromList
@@ -43,6 +40,8 @@ countFromString s = s |> map ((flip Map.singleton) 1) |> foldr1 (Map.unionWith (
 test = ["NNCB", "", "CH -> B", "HH -> N", "CB -> H", "NH -> C", "HB -> C", "HC -> B", "HN -> C", "NN -> C", "BH -> H", "NC -> B", "NB -> B", "BN -> B", "BB -> N", "BC -> B", "CC -> N", "CN -> C"]
 
 {- Old solution
+type Polymer = String
+
 expand :: Rules -> Polymer -> Polymer
 expand rules p = zip (init p) (tail p) |> map (expandOne rules) |> concat |> (++[last p])
 
