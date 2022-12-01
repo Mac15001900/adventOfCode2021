@@ -7,10 +7,7 @@ type Count = Map.Map Char Int
 type Known = Map.Map ((Char,Char), Int) Count
 
 parseRules :: [String] -> Rules
-parseRules input = map (\line->splitOn ' ' line |> \splat-> ((head $ head splat,last $ head splat), head (last splat))) input |> Map.fromList
-
-emptyCount :: String -> Count
-emptyCount input = input |> unique |> (flip zip) (repeat 0) |> Map.fromList
+parseRules input = map (\line->splitOn ' ' line |> \splat-> ((head $ head splat, last $ head splat), head (last splat))) input |> Map.fromList
 
 countFor :: Rules -> Int -> (Char, Char) -> Known -> (Count,Known)
 countFor rules n (a,b) known = case Map.lookup ((a,b), n) known of
@@ -23,7 +20,7 @@ countFor rules n (a,b) known = case Map.lookup ((a,b), n) known of
             known''' = Map.unions [known'', Map.singleton ((a, middle), n-1) count1, Map.singleton ((middle, b), n-1) count2]
 
 solve :: Int -> [String] -> Int
-solve n input = counts |> ((Map.singleton (last polymer) 1):) |> foldr1 (Map.unionWith (+)) |> Map.toList |> map snd |>  sort |> \res -> (last res) - (head res) where
+solve n input = counts |> ((Map.singleton (last polymer) 1):) |> foldr1 (Map.unionWith (+)) |> Map.toList |> map snd |> \res -> (maximum res) - (minimum res) where
     [polymerInput, rulesInput] = splitOn "" input
     polymer = head polymerInput
     counts = zip (init polymer) (tail polymer) |> map (\pair -> countFor (parseRules rulesInput) n pair Map.empty) |> map fst
@@ -33,9 +30,6 @@ part1 = solve 10
 
 part2 :: [String] -> Int
 part2 = solve 40
-
-countFromString :: String -> Count
-countFromString s = s |> map ((flip Map.singleton) 1) |> foldr1 (Map.unionWith (+))
 
 test = ["NNCB", "", "CH -> B", "HH -> N", "CB -> H", "NH -> C", "HB -> C", "HC -> B", "HN -> C", "NN -> C", "BH -> H", "NC -> B", "NB -> B", "BN -> B", "BB -> N", "BC -> B", "CC -> N", "CN -> C"]
 
@@ -56,4 +50,8 @@ part1 input = repeatF 10 (expand $ parseRules rulesInput) (head polymer) |> \lon
 partTest :: Int -> [String] -> String
 partTest n input = repeatF n (expand $ parseRules rulesInput) (head polymer) where
     [polymer, rulesInput] = splitOn "" input
+
+--Debug
+countFromString :: String -> Count
+countFromString s = s |> map ((flip Map.singleton) 1) |> foldr1 (Map.unionWith (+))
 -}

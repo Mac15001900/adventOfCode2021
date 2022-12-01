@@ -1,7 +1,8 @@
-module MyUtils (runOnFile,runOnFile2,runOnFile4,(|>),split,count,count2,freq,exists,separate,(!!?),unique,unique',combinations,
-      rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, repeatUntil, removeNothing, indexes, zipWithIndexes, zip2, zipF,
-      map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, directions2D, directions3D, flattenMaybe,
-      divF, mean, meanI, sign, pair, pairS, mapFst, mapSnd, mapBoth, fst3, snd3, thd3) where
+module MyUtils (runOnFile,runOnFile2,runOnFile4,(|>),split,count,count2,freq,exists,separate,(!!?),unique,unique',combinations, combinations3, combinationsSelf,
+      rotateMatrix,splitOn,joinWith,valueBetween, differences, tupleMap, repeatF, repeatUntil, indexes, zipWithIndexes, zip2, zipF, repeat2, repeat3,
+      map2, map3, setElement, setElement2, setElement3, changeElement, changeElement2, changeElement3, empty2, empty3, flattenMaybe, removeNothing,
+      t2toList, t3toList, t4toList, t5toList, t2fromList, t3fromList, t4fromList, t5fromList, 
+      divF, mean, meanI, sign, pair, pairS, mapFst, mapSnd, mapBoth, fst3, snd3, thd3, maximumOn, minimumOn, set) where
 import Control.Monad
 import Data.List
 import Data.Maybe
@@ -96,6 +97,14 @@ largerZip (x:xs) (ys:yss) = (x:ys):(largerZip xs yss)
 combinations :: [a] -> [b] -> [(a,b)]
 combinations as bs = map (\a-> map (\b-> (a,b)) bs) as |> concat
 
+combinations3 :: [a] -> [b] -> [c] -> [(a,b,c)]
+combinations3 as bs cs = map (\a-> map (\b-> map (\c-> (a,b,c)) cs) bs) as |> concat |> concat
+
+--Produces all combinations of two elements from an array, without symmetric of equal ones. [x,y,z] produces [(x,y),(x,z),(y,z)], but not (y,x) or (x,x)
+combinationsSelf :: [a] -> [(a,a)]
+combinationsSelf [] = []
+combinationsSelf (x:xs) = (map (pair x) xs) ++ (combinationsSelf xs)
+
 splitOn :: Eq a => a -> [a] -> [[a]]
 splitOn a xs = splitOn' a xs []
 
@@ -125,11 +134,6 @@ repeatF n f x = repeatF (n-1) f (f x)
 repeatUntil :: (a->Bool) -> (a->a) -> a -> a
 repeatUntil p f a = if p a then a else repeatUntil p f (f a)
 
-removeNothing :: [Maybe a] -> [a]
-removeNothing [] = []
-removeNothing (Nothing:xs) = removeNothing xs
-removeNothing ((Just a):xs) = a:(removeNothing xs)
-
 indexes :: [a] -> [Int]
 indexes [] = []
 indexes a = [0..(length a)-1]
@@ -142,6 +146,12 @@ zip2 ass bss = zip ass bss |> map (\(as,bs)-> zip as bs)
 
 zipF :: (a->b) -> [a] -> [(a,b)]
 zipF f as = zip as (map f as)
+
+repeat2 :: a -> [[a]]
+repeat2 a = repeat a |> repeat
+
+repeat3 :: a -> [[[a]]]
+repeat3 a = repeat a |> repeat |> repeat
 
 map2 :: (a->b) -> [[a]] -> [[b]]
 map2 f = map (map f)
@@ -173,15 +183,14 @@ changeElement2 i j f xs = (take j xs)++[changeElement i f (xs!!j)]++(drop (j+1) 
 changeElement3 :: Int -> Int -> Int -> (a->a) -> [[[a]]] -> [[[a]]]
 changeElement3 i j k f xs = (take k xs)++[changeElement2 i j f (xs!!k)]++(drop (k+1) xs)
 
-directions2D :: [(Int,Int)]
-directions2D = [(-1,-1), (0,-1), (1,-1), (-1,0), (1,0), (-1,1), (0,1), (1,1)]
-
-directions3D :: [(Int,Int,Int)]
-directions3D = [(-1,-1,-1),(-1,-1,0),(-1,-1,1),(-1,0,-1),(-1,0,0),(-1,0,1),(-1,1,-1),(-1,1,0),(-1,1,1),(0,-1,-1),(0,-1,0),(0,-1,1),(0,0,-1),(0,0,1),(0,1,-1),(0,1,0),(0,1,1),(1,-1,-1),(1,-1,0),(1,-1,1),(1,0,-1),(1,0,0),(1,0,1),(1,1,-1),(1,1,0),(1,1,1)]
-
 flattenMaybe :: Maybe (Maybe a) -> Maybe a
 flattenMaybe Nothing = Nothing
 flattenMaybe (Just a) = a
+
+removeNothing :: [Maybe a] -> [a]
+removeNothing [] = []
+removeNothing (Nothing:xs) = removeNothing xs
+removeNothing ((Just a):xs) = a:(removeNothing xs)
 
 divF :: Int -> Int -> Float
 divF x y = (fromIntegral x) / (fromIntegral y)
@@ -220,19 +229,38 @@ snd3 (a,b,c) = b
 thd3 :: (a,b,c) -> c
 thd3 (a,b,c) = c
 
+t2toList :: (a,a) -> [a]
+t2toList (x,y) = [x,y]
+t3toList :: (a,a,a) -> [a]
+t3toList (x,y,z) = [x,y,z]
+t4toList :: (a,a,a,a) -> [a]
+t4toList (x1,x2,x3,x4) = [x1,x2,x3,x4]
+t5toList :: (a,a,a,a,a) -> [a]
+t5toList (x1,x2,x3,x4,x5) = [x1,x2,x3,x4,x5]
 
+t2fromList :: [a] -> (a,a)
+t2fromList [x,y] = (x,y)
+t3fromList :: [a] -> (a,a,a)
+t3fromList [x,y,z] = (x,y,z)
+t4fromList :: [a] -> (a,a,a,a)
+t4fromList [x1,x2,x3,x4] = (x1,x2,x3,x4)
+t5fromList :: [a] -> (a,a,a,a,a)
+t5fromList [x1,x2,x3,x4,x5] = (x1,x2,x3,x4,x5)
 
+maximumOn :: Ord b => (a->b) -> [a] -> a
+maximumOn f [] = error "MaximumOn can only be called on non-empty lists"
+maximumOn f (a:as) = extremeOn (>) f as (a, (f a))
 
-tempDist :: [Float] -> Float
-tempDist [x,y] = ((394-x)**2+(411-y)**2) |> sqrt
+minimumOn :: Ord b => (a->b) -> [a] -> a
+minimumOn f [] = error "MinimumOn can only be called on non-empty lists"
+minimumOn f (a:as) = extremeOn (<) f as (a, (f a))
 
-polisDistance :: String -> Float
-polisDistance s = split (=='|') s |> map read |> tempDist
+extremeOn :: Ord b => (b->b->Bool) -> (a->b) -> [a] -> (a,b) -> a
+extremeOn op f []     (best, _)         = best
+extremeOn op f (a:as) (best, bestValue) = extremeOn op f as (if f a `op` bestValue then (a, f a) else (best, bestValue))
 
-tempCombine ::  [Int] -> [[Int]] -> [[Int]]
-tempCombine ys xss = map (\y-> map (\xs-> y:xs) xss) ys |> concat
-
-
+set :: a -> (b->a)
+set a = \_ -> a
 
 
 
